@@ -1,0 +1,7 @@
+*
+!/.gitignore
+!/main.cpp
+!/Dockerfile
+!/httplib.h
+!/json.hpp
+!/CMakeLists.txt
