@@ -29,7 +29,7 @@ Runs in an **Alpine Linux Docker container**, supports **Unix sockets & exposed 
 1. Expose Docker Daemon
 2. ```shell
     docker run -it --rm -p 8080:8080 `
-    -e DOCKER_ENDPOINT="tcp://host.docker.internal:2375" `
+    -e DOCKER_ENDPOINT="host.docker.internal:2375" `
     docker_monitor:latest
     ```
 
@@ -39,16 +39,12 @@ Once the container is running:
 
 1. List containers:
     ```shell
-    GET http://localhost:8080/containers
-    ```
-    or in Linux shell:
-    ```shell
     curl http://localhost:8080/containers
     ```
 
 2. Container stats (provide comma-separated IDs):
     ```shell
-    GET http://localhost:8080/container_stats?ids=<id1>,<id2>
+    curl http://localhost:8080/container_stats?ids=<id1>,<id2>
     ```
 
-It should return JSON results.
+It should return JSON results in the same structure as the official docker api.
