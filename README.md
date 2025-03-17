@@ -23,7 +23,7 @@ Both libraries are **header-only**, meaning they require no additional compilati
 ### Instructions without Docker Compose
 
 ```shell
-docker build -t docker_monitor:latest .
+docker build -t docker-stats-web-server .
 ```
 
 #### On a Linux Host (Not Docker Desktop)
@@ -32,7 +32,7 @@ docker build -t docker_monitor:latest .
 docker run -it --rm \
    -p 8080:8080 \
    -v /var/run/docker.sock:/var/run/docker.sock \
-   docker_monitor:latest
+   docker-stats-web-server:latest
 ```
 
 ---
@@ -54,7 +54,7 @@ docker compose up -d
 2. ```shell
    docker run -it --rm -p 8080:8080 `
     -e DOCKER_ENDPOINT="host.docker.internal:2375" `
-    docker_monitor:latest
+    docker-stats-web-server:latest
     ```
 
 ### HTTP API
