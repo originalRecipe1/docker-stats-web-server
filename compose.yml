@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  docker_stats_web_server:
+    image: docker_stats_web_server:latest
+    build:
+      context: .
+    container_name: docker_stats_web_server
+    ports:
+      - "8080:8080"
+    volumes:                # linux (without Docker Desktop)
+      - /var/run/docker.sock:/var/run/docker.sock
+    #environment:           # Docker Desktop
+    #  - DOCKER_ENDPOINT=host.docker.internal:2375
+    restart: unless-stopped

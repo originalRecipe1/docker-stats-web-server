@@ -1,13 +1,28 @@
 #include "httplib.h"
 #include "json.hpp"
 
-#include <cstdlib>   // std::getenv
+#include <cstdlib>
 #include <iostream>
+#include <csignal>
 #include <sstream>
 #include <string>
 #include <vector>
 
-// Utility: split a string by delimiter
+static httplib::Server* g_server_ptr = nullptr;
+
+void handle_signal(const int signal) {
+    std::cerr << "\nReceived signal " << signal << ", stopping server...\n";
+    if (g_server_ptr) {
+        g_server_ptr->stop();
+    }
+}
+
+void setup_signal_handlers(httplib::Server &server) {
+    g_server_ptr = &server;
+    std::signal(SIGTERM, handle_signal);
+    std::signal(SIGINT, handle_signal);
+}
+
 std::vector<std::string> split(const std::string &s, char delimiter) {
     std::vector<std::string> tokens;
     std::string token;
@@ -20,7 +35,6 @@ std::vector<std::string> split(const std::string &s, char delimiter) {
     return tokens;
 }
 
-// Returns Docker endpoint from DOCKER_ENDPOINT env var, or defaults to "unix:///var/run/docker.sock"
 std::string get_docker_endpoint() {
     if (const char* ep = std::getenv("DOCKER_ENDPOINT")) {
         return {ep};
@@ -28,32 +42,24 @@ std::string get_docker_endpoint() {
     return "unix:///var/run/docker.sock";
 }
 
-// Build a single, static Docker client once. We'll reuse it for all requests.
 httplib::Client& get_docker_client() {
-    // This static function local variable is constructed on first call
-    // and never reconstructed again.
+
     static httplib::Client docker_client([](){
-        // Figure out the endpoint
         std::string ep = get_docker_endpoint();
 
         httplib::Client client{""};
 
-        // If the endpoint starts with "unix://", strip that part and set AF_UNIX
         const std::string prefix = "unix://";
         if (ep.rfind(prefix, 0) == 0) {
             ep = ep.substr(prefix.size()); // remove "unix://"
             client = httplib::Client(ep.c_str());
             client.set_address_family(AF_UNIX);
         } else {
-            // e.g., "tcp://", "http://", etc.
             client = httplib::Client(ep.c_str());
         }
 
-        // Set a short read timeout (5 seconds)
         client.set_read_timeout(5, 0);
 
-        // Override the "Host" header so Docker doesn't complain about
-        // "400 Bad Request: malformed Host header".
         client.set_default_headers({{"Host", "localhost"}});
 
         return client;
@@ -62,7 +68,6 @@ httplib::Client& get_docker_client() {
     return docker_client;
 }
 
-// Retrieve list of Docker containers with extra error details
 std::string get_docker_containers() {
     auto &docker_client = get_docker_client();
     auto res = docker_client.Get("/containers/json");
@@ -81,7 +86,6 @@ std::string get_docker_containers() {
     return j.dump();
 }
 
-// Retrieve stats for a list of container IDs with extra error details
 std::string get_container_stats(const std::vector<std::string>& ids) {
     auto &docker_client = get_docker_client();
 
@@ -115,19 +119,16 @@ std::string get_container_stats(const std::vector<std::string>& ids) {
 }
 
 int main() {
-    // Print the Docker endpoint once at startup
     const std::string endpoint = get_docker_endpoint();
     std::cerr << "Using Docker endpoint: " << endpoint << std::endl;
 
     httplib::Server svr;
 
-    // Endpoint: List all Docker containers
     svr.Get("/containers", [](const httplib::Request&, httplib::Response &res) {
         const std::string containers = get_docker_containers();
         res.set_content(containers, "application/json");
     });
 
-    // Endpoint: Retrieve stats for specific containers (comma-separated ID list)
     svr.Get("/container_stats", [](const httplib::Request &req, httplib::Response &res) {
         if (!req.has_param("ids")) {
             res.status = 400;
@@ -154,7 +155,10 @@ int main() {
         res.set_content(error_response.dump(), "application/json");
     });
 
+    setup_signal_handlers(svr);
+
     std::cout << "Server listening on 0.0.0.0:8080\n";
     svr.listen("0.0.0.0", 8080);
+
     return 0;
 }
