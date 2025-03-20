@@ -10,15 +10,12 @@ Runs in an **Alpine Linux Docker container**, supports **Unix sockets & exposed 
 
 This project uses two external headers:
 
-- **[cpp-httplib](https://github.com/yhirose/cpp-httplib) by yhirose** – A lightweight C++ HTTP/HTTPS server and client library.
-   - License: **MIT License** (Permissive, allows free use, modification, and distribution).
+- **[cpp-httplib](https://github.com/yhirose/cpp-httplib) by yhirose**
    - Source: [GitHub](https://github.com/yhirose/cpp-httplib)
 
-- **[json.hpp (nlohmann/json)](https://github.com/nlohmann/json) by Niels Lohmann** – A modern JSON library for C++.
-   - License: **MIT License**
+- **[json.hpp (nlohmann/json)](https://github.com/nlohmann/json) by Niels Lohmann**
    - Source: [GitHub](https://github.com/nlohmann/json)
 
-Both libraries are **header-only**, meaning they require no additional compilation steps and are easy to integrate.
 
 ### Instructions without Docker Compose
 
@@ -35,6 +32,15 @@ docker run -it --rm \
    docker-stats-web-server:latest
 ```
 
+#### Docker Desktop (Windows, Mac, Linux)
+
+1. Expose Docker Daemon
+2. ```shell
+   docker run -it --rm -p 8080:8080 `
+    -e DOCKER_ENDPOINT="host.docker.internal:2375" `
+    docker-stats-web-server:latest
+    ```
+
 ---
 
 ### Instructions with Docker Compose
@@ -48,14 +54,6 @@ docker compose up -d
 
 ---
 
-#### Docker Desktop (Windows, Mac, Linux)
-
-1. Expose Docker Daemon
-2. ```shell
-   docker run -it --rm -p 8080:8080 `
-    -e DOCKER_ENDPOINT="host.docker.internal:2375" `
-    docker-stats-web-server:latest
-    ```
 
 ### HTTP API
 
