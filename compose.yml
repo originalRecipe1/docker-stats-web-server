@@ -2,10 +2,10 @@ version: "3.8"
 
 services:
   docker_stats_web_server:
-    image: docker_stats_web_server:latest
+    image: docker-stats-web-server:latest
     build:
       context: .
-    container_name: docker_stats_web_server
+    container_name: docker-stats-web-server
     ports:
       - "8080:8080"
     volumes:                # linux (without Docker Desktop)
