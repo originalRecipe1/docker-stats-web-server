@@ -46,8 +46,8 @@ docker run -it --rm \
 
 ### Instructions with Docker Compose
 
-The compose file can build the image if it does not exist yet. Depending on the machine
-(using Docker Desktop or not) comment in and out the volume or the environment.
+The compose file will build (or pull) the `docker-stats-web-server:latest` image if it does not exist yet.
+Depending on the machine (using Docker Desktop or not) comment in and out the volume or the environment.
 
 ```shell
 docker compose up -d
