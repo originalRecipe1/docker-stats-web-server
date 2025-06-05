@@ -34,7 +34,7 @@ docker run -it --rm \
 
 #### Docker Desktop (Windows, Mac, Linux)
 
-(powershell example)
+(PowerShell example)
 1. Expose Docker Daemon
 2. ```shell
    docker run -it --rm -p 8080:8080 `
