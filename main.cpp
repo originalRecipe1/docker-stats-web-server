@@ -1,5 +1,6 @@
 #include "httplib.h"
 #include "json.hpp"
+#include "split.hpp"
 
 #include <cstdlib>
 #include <iostream>
@@ -23,7 +24,6 @@ void setup_signal_handlers(httplib::Server &server) {
     std::signal(SIGINT, handle_signal);
 }
 
-#include "split.hpp"
 
 std::string get_docker_endpoint() {
     if (const char* ep = std::getenv("DOCKER_ENDPOINT")) {
