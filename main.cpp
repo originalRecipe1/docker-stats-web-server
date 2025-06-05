@@ -42,34 +42,29 @@ std::string get_docker_endpoint() {
     return "unix:///var/run/docker.sock";
 }
 
-httplib::Client& get_docker_client() {
+httplib::Client get_docker_client() {
+    std::string ep = get_docker_endpoint();
 
-    static httplib::Client docker_client([](){
-        std::string ep = get_docker_endpoint();
+    httplib::Client client{""};
 
-        httplib::Client client{""};
+    const std::string prefix = "unix://";
+    if (ep.rfind(prefix, 0) == 0) {
+        ep = ep.substr(prefix.size()); // remove "unix://"
+        client = httplib::Client(ep.c_str());
+        client.set_address_family(AF_UNIX);
+    } else {
+        client = httplib::Client(ep.c_str());
+    }
 
-        const std::string prefix = "unix://";
-        if (ep.rfind(prefix, 0) == 0) {
-            ep = ep.substr(prefix.size()); // remove "unix://"
-            client = httplib::Client(ep.c_str());
-            client.set_address_family(AF_UNIX);
-        } else {
-            client = httplib::Client(ep.c_str());
-        }
+    client.set_read_timeout(5, 0);
 
-        client.set_read_timeout(5, 0);
+    client.set_default_headers({{"Host", "localhost"}});
 
-        client.set_default_headers({{"Host", "localhost"}});
-
-        return client;
-    }());
-
-    return docker_client;
+    return client;
 }
 
 std::string get_docker_containers() {
-    auto &docker_client = get_docker_client();
+    auto docker_client = get_docker_client();
     auto res = docker_client.Get("/containers/json");
 
     if (!res) {
@@ -87,7 +82,7 @@ std::string get_docker_containers() {
 }
 
 std::string get_container_stats(const std::vector<std::string>& ids) {
-    auto &docker_client = get_docker_client();
+    auto docker_client = get_docker_client();
 
     nlohmann::json result;
     result["containers"] = nlohmann::json::array();
