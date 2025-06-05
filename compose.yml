@@ -8,8 +8,8 @@ services:
     container_name: docker_stats_web_server
     ports:
       - "8080:8080"
-    volumes:                # linux (without Docker Desktop)
+    volumes:                # Linux hosts use this volume mapping
       - /var/run/docker.sock:/var/run/docker.sock
-    #environment:           # Docker Desktop
+    #environment:           # Docker Desktop users should uncomment the lines below
     #  - DOCKER_ENDPOINT=host.docker.internal:2375
     restart: unless-stopped
