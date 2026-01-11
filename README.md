@@ -20,16 +20,21 @@ This project uses two external headers:
 ### Instructions without Docker Compose
 
 ```shell
-docker build -t docker-stats-web-server .
+docker build -t docker_stats_web_server .
+```
+or pull directly from Docker Hub
+
+```shell
+docker pull originalrecipe/docker_stats_web_server
 ```
 
 #### On a Linux Host (Not Docker Desktop)
 
 ```shell
-docker run -it --rm \
+docker run -itd --name stats_server --rm \
    -p 8080:8080 \
    -v /var/run/docker.sock:/var/run/docker.sock \
-   docker-stats-web-server:latest
+   docker_stats_web_server:latest
 ```
 
 #### Docker Desktop (Windows, Mac, Linux)
@@ -37,16 +42,23 @@ docker run -it --rm \
 (PowerShell example)
 1. Expose Docker Daemon
 2. ```shell
-   docker run -it --rm -p 8080:8080 `
+   docker run -itd --name stats_server --rm -p 8080:8080 `
     -e DOCKER_ENDPOINT="host.docker.internal:2375" `
-    docker-stats-web-server:latest
+    docker_stats_web_server:latest
     ```
+
+Podman version:
+```shell
+podman run -itd --name stats_server --rm -p 8080:8080 `
+ -e DOCKER_ENDPOINT="host.containers.internal:2375" `
+ docker_stats_web_server:latest
+```
 
 ---
 
 ### Instructions with Docker Compose
 
-The compose file will build (or pull) the `docker-stats-web-server:latest` image if it does not exist yet.
+The compose file will build (or pull) the `originalrecipe/docker_stats_web_server:latest` image if it does not exist yet.
 Depending on the machine (using Docker Desktop or not) comment in and out the volume or the environment.
 
 ```shell
